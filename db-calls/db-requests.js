@@ -1,6 +1,8 @@
 const {Pool} = require('pg')
 const dbConfig = require('../config/db-config.js')
 
+// ACCOUNTS //
+
 async function createAccount(username , password , email , role) {
     let pool = await new Pool(dbConfig)
     pool.query(`INSERT INTO accounts(username , password , email , role)
@@ -11,10 +13,29 @@ async function createAccount(username , password , email , role) {
 
 async function getAccount(email) {
     let pool = await new Pool(dbConfig)
-    pool.query('SELECT * FROM accounts WHERE email = $1' , [email])
+    pool.query('SELECT * FROM accounts WHERE email = $1 limit 1' , [email])
         .then(data => { pool.end(); return data.rows } )
         .catch(error => {pool.end(); return error })
 }
+
+// SESSIONS
+
+async function createSession(email , tokenExpire , key) {
+    let pool = await new Pool(dbConfig)
+    pool.query(`INSERT INTO sessions(email , token_expire , key)
+        VALUES($1 , $2 , $3)` , [email , tokenExpire , key])
+        .then( () => { pool.end(); return } ) 
+        .catch(error => {pool.end(); return error })
+}
+
+async function getSessionByKey(key) {
+    let pool = await new Pool(dbConfig)
+    pool.query('SELECT * FROM sessions WHERE key = $1 limit 1', [key])
+    .then(data => { pool.end(); return data.rows } )
+    .catch(error => {pool.end(); return error })
+}
+
+// BLOGS & POSTS //
 
 async function createBlog(author) {
     let pool = await new Pool(dbConfig)
@@ -39,13 +60,15 @@ async function getAllBlogsAndPosts() {
         .catch(error => {pool.end(); return error })
 }
 
-async function createPost(author , blogID , bodyArray) {
+async function createPost(author , blogID , bodyArray , timePosted) {
     let pool = await new Pool(dbConfig)
-    pool.query(`INSERT INTO posts(author , blog_id , body_array)
-        VALUES($1 , $2 , $3)` , [author , blogID , bodyArray])
+    pool.query(`INSERT INTO posts(author , blog_id , body_array , time_posted)
+        VALUES($1 , $2 , $3 , $4)` , [author , blogID , bodyArray , timePosted])
         .then(() => { pool.end(); return})
         .catch(error => {pool.end(); return error })
 }
+
+// COMMENTS //
 
 async function createComment(author , body , timePosted , postID) {
     let pool = await new Pool(dbConfig)
@@ -64,11 +87,13 @@ async function getCommentsByPostID(ID) {
 
 
 
-exports.createAccount       = createAccount
-exports.getAccount          = getAccount
-exports.createBlog          = createBlog
-exports.getBlogsByAuthor    = getBlogsByAuthor
-exports.getAllBlogsAndPosts = getAllBlogsAndPosts
-exports.createPost          = createPost
-exports.createComment       = createComment
-exports.getCommentsByPostID = getCommentsByPostID
+exports.createAccount       = createAccount;
+exports.getAccount          = getAccount;
+exports.createSession       = createSession;
+exports.getSessionByKey     = getSessionByKey;
+exports.createBlog          = createBlog;
+exports.getBlogsByAuthor    = getBlogsByAuthor;
+exports.getAllBlogsAndPosts = getAllBlogsAndPosts;
+exports.createPost          = createPost;
+exports.createComment       = createComment;
+exports.getCommentsByPostID = getCommentsByPostID;
