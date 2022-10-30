@@ -27,7 +27,8 @@ router
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .post('/createcomment' , async (req , res) => {
-        DB.createComment(req.body.author , req.body.body , req.body.timePosted , req.body.postID)
+        DB.createComment(req.body.author , req.body.body , 
+            req.body.timePosted , req.body.postID)
             .then(res.sendStatus(200))
             .catch(error => {console.log(error); res.sendStatus(500)})
     })

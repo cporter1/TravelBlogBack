@@ -22,6 +22,7 @@ async function getAccount(email) {
 
 async function createSession(email , tokenExpire , key) {
     let pool = await new Pool(dbConfig)
+    await pool.query('DELETE FROM sessions WHERE email = $1' , [email])
     await pool.query(`INSERT INTO sessions(email , token_expire , key)
         VALUES($1 , $2 , $3)` , [email , tokenExpire , key])
     pool.end()
@@ -37,7 +38,7 @@ async function getSessionByKey(key) {
 
 async function deleteSession(key) {
     let pool = await new Pool(dbConfig);
-    await pool.query(`DELETE FROM sessions WHERE key = $1` , [key])
+    await pool.query(`DELETE FROM sessions WHERE id IN (SELECT id FROM sessions WHERE key = $1)` , [key])
     pool.end()
     return;
 }
