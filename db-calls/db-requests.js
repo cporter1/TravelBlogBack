@@ -79,6 +79,14 @@ async function createPost(author , blogID , bodyArray , timePosted , title) {
     return;
 }
 
+async function featureBlog(blogID) {
+    let pool = await new Pool(dbConfig)
+    await pool.query('UPDATE blogs SET featured = FALSE')
+    await pool.query('UPDATE blogs SET featured = TRUE WHERE id = $1' , [blogID])
+    pool.end()
+    return;
+}
+
 // COMMENTS //
 
 async function createComment(author , body , timePosted , postID) {
@@ -104,6 +112,7 @@ exports.createSession       = createSession;
 exports.getSessionByKey     = getSessionByKey;
 exports.deleteSession       = deleteSession;
 exports.createBlog          = createBlog;
+exports.featureBlog         = featureBlog;
 exports.getBlogsByAuthor    = getBlogsByAuthor;
 exports.getAllBlogsAndPosts = getAllBlogsAndPosts;
 exports.createPost          = createPost;

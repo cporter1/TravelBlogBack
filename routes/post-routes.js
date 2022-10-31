@@ -20,6 +20,11 @@ router
             .then(async result => {res.send(result).status(200)})
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
+    .post('/featureblog' , async (req , res) => {
+        DB.featureBlog(req.body.blogID)
+            .then(res.sendStatus(200))
+            .catch(error => {console.log(error); res.sendStatus(500)})
+    })
     .post('/createpost' , async (req ,res) => {
         DB.createPost( req.body.author , req.body.blogID , req.body.bodyArray,
             req.body.timePosted , req.body.title)

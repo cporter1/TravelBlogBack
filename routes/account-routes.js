@@ -25,9 +25,7 @@ router
         DB.getAccount(req.body.email)
             .then(async result => {
                 if(await bcrypt.compare(req.body.password, result[0]['password'])) {
-
                     const newToken = tokenGenerator()
-
                     res.cookie('session-cookie', newToken , {
                         secure: false,
                         httpOnly: true,
@@ -48,9 +46,8 @@ router
             .catch(error => {console.log("ERROR" , error) ; res.sendStatus(500)})
     })
     .post('/signout' , (req , res) => {
-        res.cookie('session-cookie' , null , {
-            maxAge: 0
-        })
+        //delete cookie
+        res.cookie('session-cookie' , null , {maxAge: 0})
 
         DB.deleteSession( getCookieValue(req.headers.cookie) )
             .then(res.sendStatus(200))
