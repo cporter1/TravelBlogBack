@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const DB = require('../db-calls/db-requests.js')
+const DB = require('../tools/db-requests.js')
 
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
@@ -28,7 +28,7 @@ router
                     const newToken = tokenGenerator()
                     res.cookie('session-cookie', newToken , {
                         secure: false,
-                        httpOnly: true,
+                        httpOnly: false,
                     })
 
                     DB.createSession(req.body.email, Date.now() + (1000*60*60) , newToken) 
@@ -37,7 +37,9 @@ router
                 } // password do not match
                 else {res.sendStatus(401)}
             })
-            .catch(error => {res.send(error)})
+            .catch(error => {
+                console.log(error)
+                res.sendStatus(401)})
     })
     .post('/createaccount', async (req , res) => {
         const hashedPassword = await bcrypt.hash(req.body.password , 10)

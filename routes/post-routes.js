@@ -1,6 +1,8 @@
 const express = require('express');
 const router  = express.Router();
-const DB = require('../db-calls/db-requests.js')
+const DB = require('../tools/db-requests.js')
+const multer = require('multer')
+const upload = multer({dest: 'uploads/'})
 
 // maps from '/posts/...'
 
@@ -42,6 +44,10 @@ router
             .then(async result => {res.send(result).status(200)})
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
-
+    .post('/savepostarray' , upload.array('array'), async (req , res) => {
+        console.log(req.files)
+        console.log(req.body['array'])
+        res.send('mhm')
+    }) 
 
 module.exports = router;

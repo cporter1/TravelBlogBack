@@ -5,10 +5,9 @@ const dbConfig = require('../config/db-config.js')
 
 async function createAccount(username , password , email , role) {
     let pool = await new Pool(dbConfig)
-    await pool.query(`INSERT INTO accounts(username , password , email , role)
+    let data = await pool.query(`INSERT INTO accounts(username , password , email , role)
         VALUES( $1 , $2 , $3 , $4)` , [username , password , email , role])
     pool.end()
-    return;
 }
 
 async function getAccount(email) {
