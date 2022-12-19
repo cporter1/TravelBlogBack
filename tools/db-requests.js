@@ -8,6 +8,7 @@ async function createAccount(username , password , email , role) {
     let data = await pool.query(`INSERT INTO accounts(username , password , email , role)
         VALUES( $1 , $2 , $3 , $4)` , [username , password , email , role])
     pool.end()
+    return data.rows
 }
 
 async function getAccount(email) {

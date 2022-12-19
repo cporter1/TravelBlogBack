@@ -32,7 +32,7 @@ router
                     })
 
                     DB.createSession(req.body.email, Date.now() + (1000*60*60) , newToken) 
-                        .then(async () => res.sendStatus(200))
+                        .then(async () => {res.send(result)})
                         .catch(error => { console.log(error); res.sendStatus(500)})
                 } // password do not match
                 else {res.sendStatus(401)}
