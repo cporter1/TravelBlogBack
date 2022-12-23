@@ -13,7 +13,7 @@ router
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .get('/blogsbyauthor' , async (req,res) => {
-        DB.getBlogsByAuthor(req.body.author)
+        DB.getBlogsByAuthor(req.query.author)
             .then(async result => {res.send(result).status(200)})
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
