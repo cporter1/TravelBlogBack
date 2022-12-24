@@ -71,6 +71,13 @@ async function getAllBlogsAndPosts() {
     return data
 }
 
+async function getPostByID(blogID) {
+    let pool = await new Pool(dbConfig)
+    let postsData = await pool.query(`SELECT * FROM posts WHERE blog_id = $1` ,
+    [blogID])
+    return postsData
+}
+
 async function createPost(author , blogID , bodyArray , timePosted , title) {
     let pool = await new Pool(dbConfig)
     await pool.query(`INSERT INTO posts(author , blog_id , body_array , time_posted , title)
@@ -115,6 +122,7 @@ exports.createBlog          = createBlog;
 exports.featureBlog         = featureBlog;
 exports.getBlogsByAuthor    = getBlogsByAuthor;
 exports.getAllBlogsAndPosts = getAllBlogsAndPosts;
+exports.getPostByID         = getPostByID;
 exports.createPost          = createPost;
 exports.createComment       = createComment;
 exports.getCommentsByPostID = getCommentsByPostID;

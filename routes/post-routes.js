@@ -39,6 +39,11 @@ router
             .then(res.sendStatus(200))
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
+    .get('/postsbyblogid' , async (req,res) => {
+        DB.getPostByID(req.query.id)
+            .then(async result => {res.send(result)})
+            .catch(error => {console.log(error); res.sendStatus(500)})
+    })
     .get('/commentsbypostid' , async (req , res) => {
         DB.getCommentsByPostID(req.body.postID)
             .then(async result => {res.send(result).status(200)})

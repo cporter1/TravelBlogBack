@@ -1,6 +1,6 @@
 module.exports = {
     password: 'iospog',
-    host: '192.168.1.211',
+    host: process.env.DB_URL,
     database: 'travelblog',
     port: '5432',
     user: 'postgres',

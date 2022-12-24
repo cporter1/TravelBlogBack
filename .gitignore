@@ -12,6 +12,8 @@
 # production
 /build
 
+/config/
+/uploads
 .env
 
 # misc
