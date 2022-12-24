@@ -1,16 +1,23 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/config/db-config.js
 /node_modules
-/.pnp
-.pnp.js
 
 # testing
 /coverage
 
 # production
 /build
+
+# DB-config.js is missing which is:
+# module.exports = {
+#     password: 
+#     host:
+#     database: 
+#     port: 
+#     user: 
+# }
+
 
 /config
 

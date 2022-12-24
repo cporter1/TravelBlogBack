@@ -51,7 +51,7 @@ router
     })
     .post('/savepostarray' , upload.array('array'), async (req , res) => {
         console.log(req.files)
-        console.log(req.body['array'])
+        console.log('array' , req.body['array'])
         res.send('mhm')
     }) 
 
