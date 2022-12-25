@@ -1,8 +1,14 @@
 const express = require('express');
 const router  = express.Router();
 const DB = require('../tools/db-requests.js')
-const multer = require('multer')
+const multer = require('multer');
+const { uploadImage , deleteFile } = require('../tools/s3-requests.js');
 const upload = multer({dest: 'uploads/'})
+
+const fs = require('fs')
+const util = require('util')
+const unlinkFile = util.promisify(fs.unlink)
+
 
 // maps from '/posts/...'
 
@@ -52,7 +58,12 @@ router
     .post('/savepostarray' , upload.array('array'), async (req , res) => {
         console.log(req.files)
         console.log('array' , req.body['array'])
-        res.send('mhm')
+
+        const result = await uploadImage(req.files[0])
+
+        await unlinkFile(req.files[0].path)
+
+        res.send(result)
     }) 
 
 module.exports = router;
