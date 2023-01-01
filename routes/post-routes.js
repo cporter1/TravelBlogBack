@@ -9,6 +9,7 @@ const fs = require('fs')
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 
+const { savePostArray } = require('../tools/s3-requests.js')
 
 // maps from '/posts/...'
 
@@ -34,9 +35,9 @@ router
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .post('/createpost' , async (req ,res) => {
-        DB.createPost( req.body.author , req.body.blogID , req.body.bodyArray,
-            req.body.timePosted , req.body.title)
-            .then(res.sendStatus(200))
+        DB.createPost( req.body.author , req.body.blogID ,
+            Date.now() , req.body.title)
+            .then(async result  => res.send(result))
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .post('/createcomment' , async (req , res) => {
@@ -48,22 +49,21 @@ router
     .get('/postsbyblogid' , async (req,res) => {
         DB.getPostByID(req.query.id)
             .then(async result => {res.send(result)})
-            .catch(error => {console.log(error); res.sendStatus(500)})
+            .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .get('/commentsbypostid' , async (req , res) => {
         DB.getCommentsByPostID(req.body.postID)
             .then(async result => {res.send(result).status(200)})
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
-    .post('/savepostarray' , upload.array('array'), async (req , res) => {
-        console.log(req.files)
-        console.log('array' , req.body['array'])
-
-        const result = await uploadImage(req.files[0])
-
-        await unlinkFile(req.files[0].path)
-
-        res.send(result)
+    .post('/updatepostarray' , upload.array('array'), async (req , res) => {
+        savePostArray(req.body['array'] , req.files, 
+            req.body['caption'] , unlinkFile)
+            .then(async result => {
+                DB.updatePostArray(result , req.body['postID'])
+            })
+            .then(res.sendStatus(200))
+            .catch(error => {console.error(error);})
     }) 
 
 module.exports = router;
