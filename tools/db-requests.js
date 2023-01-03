@@ -86,9 +86,9 @@ async function createPost(author , blogID , timePosted , title) {
     return data.rows
 }
 
-async function updatePostArray(postArray , postID) {
+async function updatePostArray(bodyArray , postID) {
     let pool = await new Pool(dbConfig)
-    await pool.query(`UPDATE posts SET blog_array = $1 WHERE id = $2` , [postArray , postID])
+    await pool.query(`UPDATE posts SET body_array = $1 WHERE id = $2` , [bodyArray , postID])
     pool.end()
     return;
 }
