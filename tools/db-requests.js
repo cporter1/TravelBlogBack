@@ -71,11 +71,20 @@ async function getAllBlogsAndPosts() {
     return data
 }
 
-async function getPostByID(blogID) {
+async function getPostsByBlogID(blogID) {
     let pool = await new Pool(dbConfig)
     let postsData = await pool.query(`SELECT * FROM posts WHERE blog_id = $1` ,
-    [blogID])
+        [blogID])
+    pool.end()
     return postsData
+}
+
+async function getPostByPostID(postID) {
+    let pool = await new Pool(dbConfig)
+    let data = await pool.query(`SELECT * FROM posts WHERE id = $1 LIMIT 1`,
+        [postID])
+    pool.end()
+    return data
 }
 
 async function createPost(author , blogID , timePosted , title) {
@@ -129,7 +138,8 @@ exports.createBlog          = createBlog;
 exports.featureBlog         = featureBlog;
 exports.getBlogsByAuthor    = getBlogsByAuthor;
 exports.getAllBlogsAndPosts = getAllBlogsAndPosts;
-exports.getPostByID         = getPostByID;
+exports.getPostsByBlogID    = getPostsByBlogID;
+exports.getPostByPostID     = getPostByPostID;
 exports.createPost          = createPost;
 exports.updatePostArray     = updatePostArray
 exports.createComment       = createComment;

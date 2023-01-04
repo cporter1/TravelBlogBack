@@ -48,7 +48,7 @@ router
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .get('/postsbyblogid' , async (req,res) => {
-        DB.getPostByID(req.query.id)
+        DB.getPostsByBlogID(req.query.id)
             .then(async result => {
                 // console.log('/postsbyblogid' ,await fetchPostsImages(result.rows))
                 // console.log('result' , result)
@@ -56,18 +56,25 @@ router
             })
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
+    .get('/postbypostid' , async (req,res) => {
+        DB.getPostByPostID(req.query.postID)
+            .then(async result => {
+                // console.log('/postbypostid' , result)
+                res.send(await fetchPostsImages(result.rows))
+            })
+            .catch(error => {console.error(error); res.sendStatus(500)})
+    })  
     .get('/commentsbypostid' , async (req , res) => {
         DB.getCommentsByPostID(req.body.postID)
             .then(async result => {res.send(result).status(200)})
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .post('/updatepostarray' , upload.array('array'), async (req , res) => {
-        console.log('/updatepostarray' , '[array]' , req.body['array'] , 
-            'req.files' ,req.files, '[caption]' , req.body['caption'] )
-        savePostArray(req.body['array'] , req.files, 
-            req.body['caption'] , unlinkFile)
+        // console.log('/updatepostarray' , '[array]' , req.body['array'] , 
+        //     'req.files' ,req.files, '[caption]' , req.body['caption'] )
+        savePostArray(req.body['array'] , req.files , req.body['text'] , unlinkFile)
             .then(async result => {
-                console.log('savePostArray result: ' , result)
+                // console.log('savePostArray result: ' , result)
                 DB.updatePostArray(result , req.body['postID'])
             })
             .then(res.sendStatus(200))

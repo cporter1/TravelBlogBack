@@ -43,7 +43,7 @@ async function fetchPostsImages(postArray) {
             }
         }
     }
-    console.log('end of fetchPostsImages' , postArray[0].body_array)
+    // console.log('end of fetchPostsImages' , postArray[0].body_array)
     return postArray
 }
 
@@ -61,19 +61,26 @@ async function uploadImage(file) {
 // OUPUT save images to s3 bucket; save image file names as objects
 
 async function savePostArray(textArray , imageArray , captionArray , unlinkFile) {
-    let textIndex    = 0; let imageIndex   = 0; const outputArray = [];
-    if( !Array.isArray(textArray) ) textArray = [textArray];
-
+    let textIndex    = 0; let imageIndex   = 0; let captionIndex = 0; const outputArray = [];
+    if( !Array.isArray(textArray)   ) textArray    = [textArray];
+    if( !Array.isArray(captionArray)) captionArray = [captionArray]
+                 
     while( textIndex < textArray.length && textArray ) {
-        if(textArray[textIndex] === '$image$') { // found image
+        if(textArray[textIndex] === '$image$') { // found new image
             await uploadImage(imageArray[imageIndex])
             outputArray.push(
                 { 'type': 'image' , 'filename': imageArray[imageIndex].filename , 
-                    'caption': (Array.isArray(captionArray) ? 
-                    captionArray[imageIndex] : captionArray) } )
+                    'text': captionArray[captionIndex] } )
             await unlinkFile(imageArray[imageIndex].path)
-            imageIndex++
-        } else { // found text
+            imageIndex++ ; captionIndex++ }
+        else if(textArray[textIndex].substring(0,10) === '$oldimage$') { // found already uploaded image
+            outputArray.push(
+                { 'type': 'image' , 'text': captionArray[captionIndex] ,
+                    'filename': textArray[imageIndex].substring(10 , imageArray[imageIndex].length)}
+            )
+            captionIndex++
+        }
+        else { // found text
             outputArray.push( { 'type': 'text' , 'text': textArray[textIndex] } )
         }
         textIndex++
