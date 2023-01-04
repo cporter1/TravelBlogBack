@@ -71,6 +71,13 @@ async function getAllBlogsAndPosts() {
     return data
 }
 
+async function getBlogByBlogID(blogID) {
+    let pool = await new Pool(dbConfig)
+    let data = await pool.query(`SELECT * FROM blogs WHERE id = $1`, [blogID])
+    pool.end()
+    return data.rows
+}
+
 async function getPostsByBlogID(blogID) {
     let pool = await new Pool(dbConfig)
     let postsData = await pool.query(`SELECT * FROM posts WHERE blog_id = $1` ,
@@ -102,6 +109,20 @@ async function updatePostArray(bodyArray , postID) {
     return;
 }
 
+async function saveBlogTravelDates(dates , blogID) {
+    let pool = await new Pool(dbConfig)
+    await pool.query(`UPDATE blogs SET travel_dates = $1 WHERE id = $2` , [dates , blogID])
+    pool.end()
+    return;
+}
+
+async function saveBlogTitle(title , blogID) {
+    let pool = await new Pool(dbConfig)
+    await pool.query(`UPDATE blogs SET title = $1 WHERE id = $2` , [title , blogID])
+    pool.end()
+    return;
+}
+
 async function featureBlog(blogID) {
     let pool = await new Pool(dbConfig)
     await pool.query('UPDATE blogs SET featured = FALSE')
@@ -127,8 +148,9 @@ async function getCommentsByPostID(ID) {
     return data.rows;
 }
 
-
-
+exports.saveBlogTitle       = saveBlogTitle;
+exports.saveBlogTravelDates = saveBlogTravelDates;
+exports.getBlogByBlogID     = getBlogByBlogID;
 exports.createAccount       = createAccount;
 exports.getAccount          = getAccount;
 exports.createSession       = createSession;

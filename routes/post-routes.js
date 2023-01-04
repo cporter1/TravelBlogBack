@@ -47,6 +47,11 @@ router
             .then(res.sendStatus(200))
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
+    .get('/blogbyblogid' , async (req,res) => {
+        DB.getBlogByBlogID(req.query.blogID)
+            .then(async result => res.send(result))
+            .catch(error => {console.log(error); res.sendStatus(500)})
+    })
     .get('/postsbyblogid' , async (req,res) => {
         DB.getPostsByBlogID(req.query.id)
             .then(async result => {
@@ -79,6 +84,16 @@ router
             })
             .then(res.sendStatus(200))
             .catch(error => {console.error(error);})
-    }) 
+    })
+    .post('/saveblogtraveldates' , async (req,res) => {
+        DB.saveBlogTravelDates(req.body.travelDates , req.body.blogID)
+            .then(async result => {res.sendStatus(200)})
+            .catch(error => {console.error(error)})
+    })
+    .post('/saveblogtitle' , async (req,res) => {
+        DB.saveBlogTitle(req.body.title , req.body.blogID)
+            .then( res.sendStatus(200) )
+            .catch(error => {console.error(error)})
+    })
 
 module.exports = router;
