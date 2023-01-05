@@ -64,7 +64,9 @@ async function savePostArray(textArray , imageArray , captionArray , unlinkFile)
     let textIndex    = 0; let imageIndex   = 0; let captionIndex = 0; const outputArray = [];
     if( !Array.isArray(textArray)   ) textArray    = [textArray];
     if( !Array.isArray(captionArray)) captionArray = [captionArray]
-                 
+    if( !Array.isArray(textArray)) textArray = [textArray]
+    // console.log('savePostArray' , '[array]: ' , textArray , 
+    //         'req.files: ' , imageArray, '[caption]: ' , captionArray )         
     while( textIndex < textArray.length && textArray ) {
         if(textArray[textIndex] === '$image$') { // found new image
             await uploadImage(imageArray[imageIndex])
@@ -76,7 +78,7 @@ async function savePostArray(textArray , imageArray , captionArray , unlinkFile)
         else if(textArray[textIndex].substring(0,10) === '$oldimage$') { // found already uploaded image
             outputArray.push(
                 { 'type': 'image' , 'text': captionArray[captionIndex] ,
-                    'filename': textArray[imageIndex].substring(10 , imageArray[imageIndex].length)}
+                    'filename': textArray[textIndex].substring(10 , textArray[textIndex].length)}
             )
             captionIndex++
         }

@@ -94,10 +94,10 @@ async function getPostByPostID(postID) {
     return data
 }
 
-async function createPost(author , blogID , timePosted , title) {
+async function createPost(author , blogID , timePosted , title , publish) {
     let pool = await new Pool(dbConfig)
-    let data = await pool.query(`INSERT INTO posts(author , blog_id , time_posted , title)
-        VALUES($1 , $2 , $3 , $4) RETURNING id` , [author , blogID , timePosted , title])
+    let data = await pool.query(`INSERT INTO posts(author , blog_id , time_posted , title , published)
+        VALUES($1 , $2 , $3 , $4 , $5) RETURNING id` , [author , blogID , timePosted , title, publish])
     pool.end()
     return data.rows
 }
@@ -131,6 +131,13 @@ async function featureBlog(blogID) {
     return;
 }
 
+async function changePublishPostStatus(postID) {
+    let pool = await new Pool(dbConfig)
+    await pool.query('UPDATE posts SET published = NOT published WHERE id = $1' , [postID])
+    pool.end()
+    return;
+}
+
 // COMMENTS //
 
 async function createComment(author , body , timePosted , postID) {
@@ -148,6 +155,7 @@ async function getCommentsByPostID(ID) {
     return data.rows;
 }
 
+exports.changePublishPostStatus = changePublishPostStatus;
 exports.saveBlogTitle       = saveBlogTitle;
 exports.saveBlogTravelDates = saveBlogTravelDates;
 exports.getBlogByBlogID     = getBlogByBlogID;

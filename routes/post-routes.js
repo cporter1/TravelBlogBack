@@ -37,7 +37,7 @@ router
     })
     .post('/createpost' , async (req ,res) => {
         DB.createPost( req.body.author , req.body.blogID ,
-            Date.now() , req.body.title)
+            Date.now() , req.body.title , req.body.publish)
             .then(async result  => res.send(result))
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
@@ -75,8 +75,8 @@ router
             .catch(error => {console.log(error); res.sendStatus(500)})
     })
     .post('/updatepostarray' , upload.array('array'), async (req , res) => {
-        // console.log('/updatepostarray' , '[array]' , req.body['array'] , 
-        //     'req.files' ,req.files, '[caption]' , req.body['caption'] )
+        // console.log('/updatepostarray' , '[array]: ' , req.body['array'] , 
+        //     'req.files: ' ,req.files, '[caption]: ' , req.body['text'] )
         savePostArray(req.body['array'] , req.files , req.body['text'] , unlinkFile)
             .then(async result => {
                 // console.log('savePostArray result: ' , result)
@@ -94,6 +94,17 @@ router
         DB.saveBlogTitle(req.body.title , req.body.blogID)
             .then( res.sendStatus(200) )
             .catch(error => {console.error(error)})
+    })
+    .post('/featureblog' , async (req,res) => {
+        DB.featureBlog(req.body.blogID)
+            .then( res.sendStatus(200) )
+            .catch(error => {console.error(error)})
+    })
+    .post('/publishpost' , async (req,res) => {
+        DB.changePublishPostStatus(req.body.postID)
+        .then( res.sendStatus(200) )
+        .catch(error => {console.error(error)})
+
     })
 
 module.exports = router;
