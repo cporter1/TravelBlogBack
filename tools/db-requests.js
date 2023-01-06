@@ -27,11 +27,11 @@ async function getAccount(email) {
 
 // SESSIONS
 
-async function createSession(email , tokenExpire , key) {
+async function createSession(username, tokenExpire , key) {
     let pool = await new Pool(dbConfig)
-    await pool.query('DELETE FROM sessions WHERE email = $1' , [email])
-    await pool.query(`INSERT INTO sessions(email , token_expire , key)
-        VALUES($1 , $2 , $3)` , [email , tokenExpire , key])
+    await pool.query('DELETE FROM sessions WHERE username = $1' , [username])
+    await pool.query(`INSERT INTO sessions(username , token_expire , key)
+        VALUES($1 , $2 , $3)` , [username, tokenExpire , key])
     pool.end()
     return;
 }

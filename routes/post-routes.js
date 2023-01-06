@@ -9,7 +9,7 @@ const fs = require('fs')
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 
-const { formatPostArrayUploadImages, getImage , fetchPostsImages} 
+const { formatPostArrayUploadImages, fetchPostsImages} 
     = require('../tools/s3-requests.js');
 
 // maps from '/posts/...'

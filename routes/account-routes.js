@@ -22,7 +22,7 @@ function getCookieValue(cookie) {
 
 router
     .post('/signin' , async (req , res) => {
-        DB.getAccount(req.body.email)
+        DB.getAccount(req.body.username)
             .then(async result => {
                 if(await bcrypt.compare(req.body.password, result[0]['password'])) {
                     const newToken = tokenGenerator()
@@ -31,7 +31,7 @@ router
                         httpOnly: false,
                     })
 
-                    DB.createSession(req.body.email, Date.now() + (1000*60*60) , newToken) 
+                    DB.createSession(result[0].username, Date.now() + (1000*60*60) , newToken) 
                         .then(async () => {res.send(result)})
                         .catch(error => { console.log(error); res.sendStatus(500)})
                 } // password do not match
