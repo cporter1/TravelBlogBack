@@ -11,6 +11,13 @@ async function createAccount(username , password , email , role) {
     return data.rows
 }
 
+// async function getAllAccounts() {
+//     let pool = await new Pool(dbConfig)
+//     let data = await pool.query('SELECT * FROM accounts' , [email])
+//     pool.end()
+//     return data.rows
+// }
+
 async function getAccount(email) {
     let pool = await new Pool(dbConfig)
     let data = await pool.query('SELECT * FROM accounts WHERE email = $1 limit 1' , [email])
@@ -56,19 +63,15 @@ async function createBlog(author , title) {
 async function getBlogsByAuthor(author) {
     let pool = await new Pool(dbConfig)
     let blogData = await pool.query(`SELECT * FROM blogs WHERE author = $1` , [author])
-    let postData = await pool.query(`SELECT * FROM posts WHERE author = $1` , [author])
-    let data = ['blogs' , ...blogData.rows , 'posts' ,  ...postData.rows]
     pool.end()
-    return data
+    return blogData.rows
 }
 
-async function getAllBlogsAndPosts() {
+async function getAllBlogs() {
     let pool = await new Pool(dbConfig)
     let blogData = await pool.query(`SELECT * FROM blogs`)
-    let postData = await pool.query(`SELECT * FROM posts`)
-    let data = ['blogs' , ...blogData.rows , 'posts' ,  ...postData.rows]
     pool.end()
-    return data
+    return blogData.rows
 }
 
 async function getBlogByBlogID(blogID) {
@@ -132,6 +135,14 @@ async function featureBlog(blogID) {
     return;
 }
 
+async function getFeaturedBlogAndPosts() {
+    let pool = await new Pool(dbConfig)
+    const blogData = await pool.query('SELECT * FROM blogs WHERE featured = TRUE LIMIT 1')
+    const bodyData = await pool.query('SELECT * FROM posts WHERE blog_id = $1' , [blogData.rows[0].id])
+    pool.end()
+    return [blogData.rows[0] , bodyData.rows]
+}
+
 async function changePublishPostStatus(postID) {
     let pool = await new Pool(dbConfig)
     await pool.query('UPDATE posts SET published = NOT published WHERE id = $1' , [postID])
@@ -163,6 +174,7 @@ async function getCommentsByPostID(ID) {
     return data.rows;
 }
 
+exports.getFeaturedBlogAndPosts = getFeaturedBlogAndPosts;
 exports.updateBlogLastActivity  = updateBlogLastActivity;
 exports.changePublishPostStatus = changePublishPostStatus;
 exports.saveBlogTitle       = saveBlogTitle;
@@ -176,7 +188,7 @@ exports.deleteSession       = deleteSession;
 exports.createBlog          = createBlog;
 exports.featureBlog         = featureBlog;
 exports.getBlogsByAuthor    = getBlogsByAuthor;
-exports.getAllBlogsAndPosts = getAllBlogsAndPosts;
+exports.getAllBlogs         = getAllBlogs;
 exports.getPostsByBlogID    = getPostsByBlogID;
 exports.getPostByPostID     = getPostByPostID;
 exports.createPost          = createPost;

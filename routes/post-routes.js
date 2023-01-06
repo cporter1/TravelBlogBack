@@ -26,8 +26,8 @@ router
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .get('/allblogs' , async (req,res) => { 
-        DB.getAllBlogsAndPosts()
-            .then(async result => {res.send(result).status(200)})
+        DB.getAllBlogs()
+            .then(async result => {res.send(result)})
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .post('/featureblog' , async (req , res) => {
@@ -98,6 +98,12 @@ router
     .post('/featureblog' , async (req,res) => {
         DB.featureBlog(req.body.blogID)
             .then( res.sendStatus(200) )
+            .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .get('/getfeaturedblog' , async (req,res) => {
+        DB.getFeaturedBlogAndPosts()
+            .then(async result => {
+                res.send([result[0] , await fetchPostsImages(result[1]) ]) })
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .post('/publishpost' , async (req,res) => {
