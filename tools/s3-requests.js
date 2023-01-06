@@ -60,7 +60,7 @@ async function uploadImage(file) {
 // INPUT 3 arrays (image & text & caption) 
 // OUPUT save images to s3 bucket; save image file names as objects
 
-async function savePostArray(textArray , imageArray , captionArray , unlinkFile) {
+async function formatPostArrayUploadImages(textArray , imageArray , captionArray , unlinkFile) {
     let textIndex    = 0; let imageIndex   = 0; let captionIndex = 0; const outputArray = [];
     if( !Array.isArray(textArray)   ) textArray    = [textArray];
     if( !Array.isArray(captionArray)) captionArray = [captionArray]
@@ -93,4 +93,4 @@ async function savePostArray(textArray , imageArray , captionArray , unlinkFile)
 exports.fetchPostsImages = fetchPostsImages
 exports.getImage    = getImage
 exports.uploadImage = uploadImage
-exports.savePostArray = savePostArray
+exports.formatPostArrayUploadImages = formatPostArrayUploadImages;

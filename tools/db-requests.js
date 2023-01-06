@@ -104,9 +104,10 @@ async function createPost(author , blogID , timePosted , title , publish) {
 
 async function updatePostArray(bodyArray , postID) {
     let pool = await new Pool(dbConfig)
-    await pool.query(`UPDATE posts SET body_array = $1 WHERE id = $2` , [bodyArray , postID])
+    let data = await pool.query(`UPDATE posts SET body_array = $1 WHERE id = $2 
+        RETURNING blog_id` , [bodyArray , postID])
     pool.end()
-    return;
+    return data.rows[0].blog_id
 }
 
 async function saveBlogTravelDates(dates , blogID) {
@@ -138,6 +139,13 @@ async function changePublishPostStatus(postID) {
     return;
 }
 
+async function updateBlogLastActivity(blogID , date = Date.now()) {
+    let pool = await new Pool(dbConfig)
+    await pool.query('UPDATE blogs SET last_updated = $1 WHERE id = $2' , [date , blogID])
+    pool.end()
+    return;
+}
+
 // COMMENTS //
 
 async function createComment(author , body , timePosted , postID) {
@@ -155,6 +163,7 @@ async function getCommentsByPostID(ID) {
     return data.rows;
 }
 
+exports.updateBlogLastActivity  = updateBlogLastActivity;
 exports.changePublishPostStatus = changePublishPostStatus;
 exports.saveBlogTitle       = saveBlogTitle;
 exports.saveBlogTravelDates = saveBlogTravelDates;
