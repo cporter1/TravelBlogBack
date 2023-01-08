@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
 
 const bodyParser  = require('body-parser');
 app.use(bodyParser.json())
@@ -16,10 +17,16 @@ require('dotenv').config();
 app.use( (req , res, next ) => {
     res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN)
     res.setHeader('Access-Control-Allow-Credentials' , 'true')
-    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next()
 })
+
+const corsOptions = {
+    origin: true,
+    credentials: true
+  }
+app.options('*', cors(corsOptions));
 
 
 app.use('/accounts' , accRoutes);

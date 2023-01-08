@@ -8,7 +8,7 @@ const crypto = require('crypto')
 // maps from '/accounts/...'
 
 function tokenGenerator() {
-    return crypto.randomBytes(20).toString('base64').slice(0 , 19)
+    return (Math.random() + 1).toString(30).substring(2)
 }
 
 function getCookieValue(cookie) {
@@ -30,9 +30,8 @@ router
                         secure: false,
                         httpOnly: false,
                     })
-
                     DB.createSession(result[0].username, Date.now() + (1000*60*60) , newToken) 
-                        .then(async () => {res.send(result)})
+                        .then(async () => {res.send(result).status(200)})
                         .catch(error => { console.log(error); res.sendStatus(500)})
                 } // password do not match
                 else {res.sendStatus(401)}

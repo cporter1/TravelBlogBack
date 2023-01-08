@@ -12,7 +12,11 @@ const unlinkFile = util.promisify(fs.unlink)
 const { formatPostArrayUploadImages, fetchPostsImages} 
     = require('../tools/s3-requests.js');
 
+const { validUserSessions } = require('../tools/middleware')
+
 // maps from '/posts/...'
+
+router.use(validUserSessions)
 
 router
     .post('/createblog' , async (req , res) => {
@@ -53,19 +57,25 @@ router
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .get('/postsbyblogid' , async (req,res) => {
-        DB.getPostsByBlogID(req.query.id)
-            .then(async result => {
-                // console.log('/postsbyblogid' ,await fetchPostsImages(result.rows))
-                // console.log('result' , result)
-                res.send(await fetchPostsImages(result.rows))
+        DB.getPostsByBlogID(req.query.id) 
+            .then(async result => { // filter out non-published posts for blog guests
+                let array = []
+                if(result[0].author === req.username) { // owner's blog
+                    array = result
+                }
+                else { // not the owner's blog
+                    array = result.filter( element => element.published === true)
+                }
+                res.send(await fetchPostsImages(array))
             }) 
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .get('/postbypostid' , async (req,res) => {
         DB.getPostByPostID(req.query.postID)
             .then(async result => {
-                // console.log('/postbypostid' , result)
-                res.send(await fetchPostsImages(result.rows))
+                if(result.rows[0].author !== req.username) res.sendStatus(401)
+                else {
+                    res.send(await fetchPostsImages(result.rows))}
             })
             .catch(error => {console.error(error); res.sendStatus(500)})
     })  
@@ -97,7 +107,7 @@ router
     })
     .post('/featureblog' , async (req,res) => {
         DB.featureBlog(req.body.blogID)
-            .then( res.sendStatus(200) )
+            .then( async () => res.sendStatus(200) )
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .get('/getfeaturedblog' , async (req,res) => {
