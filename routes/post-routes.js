@@ -2,7 +2,6 @@ const express = require('express');
 const router  = express.Router();
 const DB = require('../tools/db-requests.js')
 const multer = require('multer');
-const { uploadImage , deleteFile } = require('../tools/s3-requests.js');
 const upload = multer({dest: 'uploads/'})
 
 const fs = require('fs')
@@ -12,9 +11,19 @@ const unlinkFile = util.promisify(fs.unlink)
 const { formatPostArrayUploadImages, fetchPostsImages} 
     = require('../tools/s3-requests.js');
 
-const { validUserSessions } = require('../tools/middleware')
+const { validUserSessions, needAdminPrivs } = require('../tools/middleware')
 
 // maps from '/posts/...'
+
+
+router
+    .post('/featureblog' , needAdminPrivs, async (req,res) => {
+        DB.featureBlog(req.body.blogID)
+            .then( async () => res.sendStatus(200) )
+            .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+
+// routes below just need a valid session
 
 router.use(validUserSessions)
 
@@ -59,6 +68,7 @@ router
     .get('/postsbyblogid' , async (req,res) => {
         DB.getPostsByBlogID(req.query.id) 
             .then(async result => { // filter out non-published posts for blog guests
+                if(result[0] === undefined) {res.send(result);return}
                 let array = []
                 if(result[0].author === req.username) { // owner's blog
                     array = result
@@ -78,6 +88,11 @@ router
                     res.send(await fetchPostsImages(result.rows))}
             })
             .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .post('/deletepost' , async (req, res) => {
+        DB.deletePost(req.body.postID)
+            .then( res.sendStatus(200))
+            .catch(error => {console.error(error); res,sendStatus(500)})
     })  
     .get('/commentsbypostid' , async (req , res) => {
         DB.getCommentsByPostID(req.body.postID)
@@ -105,11 +120,6 @@ router
             .then( res.sendStatus(200) )
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
-    .post('/featureblog' , async (req,res) => {
-        DB.featureBlog(req.body.blogID)
-            .then( async () => res.sendStatus(200) )
-            .catch(error => {console.error(error); res.sendStatus(500)})
-    })
     .get('/getfeaturedblog' , async (req,res) => {
         DB.getFeaturedBlogAndPosts()
             .then(async result => {
@@ -122,5 +132,7 @@ router
         .catch(error => {console.error(error); res.sendStatus(500)})
 
     })
+
+
 
 module.exports = router;

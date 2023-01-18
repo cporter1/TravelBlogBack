@@ -30,7 +30,7 @@ router
                         secure: false,
                         httpOnly: false,
                     })
-                    DB.createSession(result[0].username, Date.now() + (1000*60*60) , newToken) 
+                    DB.createSession(result[0].username, Date.now() + (1000*60*60) , newToken, result[0].role) 
                         .then(async () => {res.send(result).status(200)})
                         .catch(error => { console.log(error); res.sendStatus(500)})
                 } // password do not match
@@ -46,13 +46,18 @@ router
             .then(()  => res.sendStatus(200))
             .catch(error => {console.log("ERROR" , error) ; res.sendStatus(500)})
     })
-    .post('/signout' , (req , res) => {
+    .post('/signout' , async (req , res) => {
         //delete cookie
         res.cookie('session-cookie' , null , {maxAge: 0})
 
         DB.deleteSession( getCookieValue(req.headers.cookie) )
             .then(res.sendStatus(200))
             .catch(error => {console.log('signOut Error: ', error); res.sendStatus(500)})
+    })
+    .get('/allaccounts', async (req, res) => {
+        DB.getAllAccounts()
+            .then(async result => {res.send(result)})
+            .catch(err => res.sendStatus(500))
     })
 
 module.exports = router;

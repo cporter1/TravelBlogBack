@@ -25,6 +25,10 @@ exports.validUserSessions = async function(req , res , next) {
         .catch(() => {res.sendStatus(401)})
 }
 
-function getUsernameFromSession(req , res , next) {
-    
-}
+exports.needAdminPrivs = async function(req, res , next) {
+    await DB.getSessionByKey( getCookieValue(req.headers.cookie) )
+        .then(async result => {
+            if(result.length === 0 || result[0].role !== 'admin') res.sendStatus(401);
+            else next()
+        })
+}       

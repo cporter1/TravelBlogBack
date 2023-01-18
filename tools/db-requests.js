@@ -11,12 +11,12 @@ async function createAccount(username , password , email , role) {
     return data.rows
 }
 
-// async function getAllAccounts() {
-//     let pool = await new Pool(dbConfig)
-//     let data = await pool.query('SELECT * FROM accounts' , [email])
-//     pool.end()
-//     return data.rows
-// }
+async function getAllAccounts() {
+    let pool = await new Pool(dbConfig)
+    let data = await pool.query('SELECT username, email, role FROM accounts')
+    pool.end()
+    return data.rows
+}
 
 async function getAccount(email) {
     let pool = await new Pool(dbConfig)
@@ -27,11 +27,11 @@ async function getAccount(email) {
 
 // SESSIONS
 
-async function createSession(username, tokenExpire , key) {
+async function createSession(username, tokenExpire , key, role) {
     let pool = await new Pool(dbConfig)
     await pool.query('DELETE FROM sessions WHERE username = $1' , [username])
-    await pool.query(`INSERT INTO sessions(username , token_expire , key)
-        VALUES($1 , $2 , $3)` , [username, tokenExpire , key])
+    await pool.query(`INSERT INTO sessions(username , token_expire , key, role)
+        VALUES($1 , $2 , $3, $4)` , [username, tokenExpire , key, role])
     pool.end()
     return;
 }
@@ -62,14 +62,14 @@ async function createBlog(author , title) {
 
 async function getBlogsByAuthor(author) {
     let pool = await new Pool(dbConfig)
-    let blogData = await pool.query(`SELECT * FROM blogs WHERE author = $1` , [author])
+    let blogData = await pool.query(`SELECT * FROM blogs WHERE author = $1 ORDER BY last_updated DESC` , [author])
     pool.end()
     return blogData.rows
 }
 
 async function getAllBlogs() {
     let pool = await new Pool(dbConfig)
-    let blogData = await pool.query(`SELECT * FROM blogs`)
+    let blogData = await pool.query(`SELECT * FROM blogs ORDER BY last_updated DESC`)
     pool.end()
     return blogData.rows
 }
@@ -83,7 +83,7 @@ async function getBlogByBlogID(blogID) {
 
 async function getPostsByBlogID(blogID) {
     let pool = await new Pool(dbConfig)
-    let postsData = await pool.query(`SELECT * FROM posts WHERE blog_id = $1` ,
+    let postsData = await pool.query(`SELECT * FROM posts WHERE blog_id = $1 ORDER BY time_posted DESC` ,
         [blogID])
     pool.end()
     return postsData.rows
@@ -103,6 +103,13 @@ async function createPost(author , blogID , timePosted , title , publish) {
         VALUES($1 , $2 , $3 , $4 , $5) RETURNING id` , [author , blogID , timePosted , title, publish])
     pool.end()
     return data.rows
+}
+
+async function deletePost(postID) {
+    let pool = await new Pool(dbConfig)
+    await pool.query('DELETE FROM posts WHERE id = $1' , [postID])
+    pool.end()
+    return;
 }
 
 async function updatePostArray(bodyArray , postID) {
@@ -138,7 +145,9 @@ async function featureBlog(blogID) {
 async function getFeaturedBlogAndPosts() {
     let pool = await new Pool(dbConfig)
     const blogData = await pool.query('SELECT * FROM blogs WHERE featured = TRUE LIMIT 1')
-    const bodyData = await pool.query('SELECT * FROM posts WHERE blog_id = $1' , [blogData.rows[0].id])
+    const bodyData = 
+        await pool.query('SELECT * FROM posts WHERE blog_id = $1 AND published = TRUE ORDER BY time_posted DESC', 
+        [blogData.rows[0].id])
     pool.end()
     return [blogData.rows[0] , bodyData.rows]
 }
@@ -156,6 +165,7 @@ async function updateBlogLastActivity(blogID , date = Date.now()) {
     pool.end()
     return;
 }
+
 
 // COMMENTS //
 
@@ -195,3 +205,5 @@ exports.createPost          = createPost;
 exports.updatePostArray     = updatePostArray
 exports.createComment       = createComment;
 exports.getCommentsByPostID = getCommentsByPostID;
+exports.deletePost          = deletePost
+exports.getAllAccounts = getAllAccounts;
