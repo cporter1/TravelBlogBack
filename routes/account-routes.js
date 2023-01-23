@@ -4,6 +4,7 @@ const DB = require('../tools/db-requests.js')
 
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const {needAdminPrivs} = require('../tools/middleware')
 
 // maps from '/accounts/...'
 
@@ -40,7 +41,7 @@ router
                 console.log(error)
                 res.sendStatus(401)})
     })
-    .post('/createaccount', async (req , res) => {
+    .post('/createaccount', needAdminPrivs, async (req , res) => {
         const hashedPassword = await bcrypt.hash(req.body.password , 10)
         DB.createAccount(req.body.username , hashedPassword , req.body.email , req.body.role)
             .then(()  => res.sendStatus(200))

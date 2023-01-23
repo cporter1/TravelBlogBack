@@ -33,6 +33,7 @@ async function fetchPostsImages(postArray) {
     if(postArray[0] === undefined) return;
     for(let postsIndex = 0; postsIndex < postArray.length; 
         postsIndex++) {
+        if(!postArray[postsIndex]['body_array']) return;
         for(let bodyIndex = 0; bodyIndex < 
             postArray[postsIndex]['body_array'].length; bodyIndex++) {
             
