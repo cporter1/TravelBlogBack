@@ -105,6 +105,7 @@ router
         formatPostArrayUploadImages(req.body['array'] , req.files , req.body['text'] , 
             unlinkFile )
             .then(async result => {
+                console.log(result)
                 return DB.updatePostArray(result , req.body['postID'])})
             .then(async result => { DB.updateBlogLastActivity(result) })
             .then(res.sendStatus(200))
@@ -117,6 +118,11 @@ router
     })
     .post('/saveblogtitle' , async (req,res) => {
         DB.saveBlogTitle(req.body.title , req.body.blogID)
+            .then( res.sendStatus(200) )
+            .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .post('/saveposttitle' , async (req,res) => {
+        DB.savePostTitle(req.body.postID , req.body.title)
             .then( res.sendStatus(200) )
             .catch(error => {console.error(error); res.sendStatus(500)})
     })

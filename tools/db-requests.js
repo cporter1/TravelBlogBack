@@ -134,6 +134,13 @@ async function saveBlogTitle(title , blogID) {
     return;
 }
 
+async function savePostTitle(postID, title) {
+    let pool = await new Pool(dbConfig)
+    await pool.query(`UPDATE posts SET title = $2 WHERE id = $1` , [postID , title])
+    pool.end()
+    return;
+}
+
 async function featureBlog(blogID) {
     let pool = await new Pool(dbConfig)
     await pool.query('UPDATE blogs SET featured = FALSE')
@@ -207,3 +214,4 @@ exports.createComment       = createComment;
 exports.getCommentsByPostID = getCommentsByPostID;
 exports.deletePost          = deletePost
 exports.getAllAccounts = getAllAccounts;
+exports.savePostTitle = savePostTitle;
