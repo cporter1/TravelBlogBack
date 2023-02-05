@@ -21,6 +21,8 @@
 
 /config
 
+/sslcert
+
 /uploads
 .env
 

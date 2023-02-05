@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const fs  = require('fs')
 
 const bodyParser  = require('body-parser');
 app.use(bodyParser.json())
@@ -10,6 +11,7 @@ const accRoutes = require('./routes/account-routes')
 const postRoutes = require('./routes/post-routes')
 
 const http = require('http')
+const https = require('https')
 require('dotenv').config();
 
 // Access Control
@@ -32,6 +34,15 @@ app.options('*', cors(corsOptions));
 app.use('/accounts' , accRoutes);
 app.use('/posts'    , postRoutes);
 
-http.createServer(app).listen(8080 , () => {
+const httpsOptions = {
+    cert: fs.readFileSync('./sslcert/cert.pem'),
+    key: fs.readFileSync('./sslcert/key.pem')
+}
+
+https.createServer(httpsOptions, app).listen(443 , () => {
     console.log('server started on port ' + 8080)
 })
+
+// http.createServer(app).listen(8080 , () => {
+//     console.log('server started on port ' + 8080)
+// })
