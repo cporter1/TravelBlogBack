@@ -41,7 +41,7 @@ router
                 console.log(error)
                 res.sendStatus(401)})
     })
-    .post('/createaccount', needAdminPrivs, async (req , res) => {
+    .post('/createaccount',  async (req , res) => {
         const hashedPassword = await bcrypt.hash(req.body.password , 10)
         DB.createAccount(req.body.username , hashedPassword , req.body.email , req.body.role)
             .then(()  => res.sendStatus(200))

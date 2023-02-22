@@ -15,7 +15,6 @@ const { validUserSessions, needAdminPrivs } = require('../tools/middleware')
 
 // maps from '/posts/...'
 
-
 router
     .post('/featureblog' , needAdminPrivs, async (req,res) => {
         DB.featureBlog(req.body.blogID)
@@ -23,7 +22,7 @@ router
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
 
-// routes below just need a valid session
+// routes below need a valid session
 
 router.use(validUserSessions)
 
