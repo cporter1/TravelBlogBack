@@ -19,21 +19,32 @@ const s3 = new S3({
 
 // S3 Functions
 
+// async function getImage(key) {
+//     const params = {Bucket: bucketName , Key: key}
+
+//     return await s3.getObject(params).promise()
+//         .catch(error => console.error(error))
+
+// }
+
 async function getImage(key) {
     const params = {Bucket: bucketName , Key: key}
-
-    return await s3.getObject(params).promise()
-        .catch(error => console.error(error))
-
+    return await s3.getSignedUrl('getObject' , {
+        Bucket: bucketName,
+        Key: key,
+        Expires: 60
+        }
+    )
 }
 
 // INPUT postArray
 // OUTPUT go through each post's blogArray => find images => attach file
 async function fetchPostsImages(postArray) {
+    // console.log(postArray)
     if(postArray[0] === undefined) return;
     for(let postsIndex = 0; postsIndex < postArray.length; 
         postsIndex++) {
-        if(!postArray[postsIndex]['body_array']) return;
+        if(!postArray[postsIndex]['body_array']) continue;
         for(let bodyIndex = 0; bodyIndex < 
             postArray[postsIndex]['body_array'].length; bodyIndex++) {
             
@@ -49,10 +60,11 @@ async function fetchPostsImages(postArray) {
 }
 
 async function uploadImage(file) {
+    console.log(file)
     const fileStream = fs.createReadStream(file.path)
 
     const uploadParams = {
-        Bucket: bucketName, Body: fileStream, Key: file.filename
+        Bucket: bucketName, Body: fileStream, Key: file.filename, ContentType: file.mimietype
     }
 
     return s3.upload(uploadParams).promise()
