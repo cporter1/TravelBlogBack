@@ -64,7 +64,7 @@ async function uploadImage(file) {
     const fileStream = fs.createReadStream(file.path)
 
     const uploadParams = {
-        Bucket: bucketName, Body: fileStream, Key: file.filename, ContentType: file.mimietype
+        Bucket: bucketName, Body: fileStream, Key: file.filename, ContentType: file.mimetype
     }
 
     return s3.upload(uploadParams).promise()
