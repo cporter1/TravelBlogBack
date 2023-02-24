@@ -40,7 +40,7 @@ const httpsOptions = {
 }
 
 https.createServer(httpsOptions, app).listen(process.env.PORT , () => {
-    console.log('server started on port ' + 8080)
+    console.log('server started on port ' + process.env.PORT)
 })
 
 // http.createServer(app).listen(8080 , () => {

@@ -27,7 +27,7 @@ router
 router.use(validUserSessions)
 
 router
-    .post('/createblog' , async (req , res) => {
+    .post('/createblog' ,needAdminPrivs, async (req , res) => {
         DB.createBlog(req.body.author , req.body.title)
             .then(res.sendStatus(200))
             .catch(error => {console.error(error); res.sendStatus(500)})
