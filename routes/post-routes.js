@@ -67,8 +67,8 @@ router
     .get('/postsbyblogid' , async (req,res) => {
         DB.getPostsByBlogID(req.query.id) 
             .then(async result => { // filter out non-published posts for blog guests
-                console.log(result)
-                console.log(req.username)
+                // console.log(result)
+                // console.log(req.username)
                 if(result[0] === undefined) {res.send(result);return}
                 let array = []
                 if(result[0].author === req.username) { // owner's blog
@@ -77,7 +77,7 @@ router
                 else { // not the owner's blog
                     array = result.filter( element => element.published === true)
                 }
-                console.log(await fetchPostsImages(array))
+                // console.log(await fetchPostsImages(array))
                 res.send(await fetchPostsImages(array))
             }) 
             .catch(error => {console.error(error); res.sendStatus(500)})

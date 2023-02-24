@@ -60,7 +60,7 @@ async function fetchPostsImages(postArray) {
 }
 
 async function uploadImage(file) {
-    console.log(file)
+    // console.log(file)
     const fileStream = fs.createReadStream(file.path)
 
     const uploadParams = {
