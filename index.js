@@ -39,7 +39,7 @@ const httpsOptions = {
     key: fs.readFileSync('./sslcert/key.pem')
 }
 
-https.createServer(httpsOptions, app).listen(443 , () => {
+https.createServer(httpsOptions, app).listen(process.env.PORT , () => {
     console.log('server started on port ' + 8080)
 })
 
