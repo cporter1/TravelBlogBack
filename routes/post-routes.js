@@ -107,7 +107,7 @@ router
         formatPostArrayUploadImages(req.body['array'] , req.files , req.body['text'] , 
             unlinkFile )
             .then(async result => {
-                console.log(result)
+                // console.log(result)
                 return DB.updatePostArray(result , req.body['postID'])})
             .then(async result => { DB.updateBlogLastActivity(result) })
             .then(res.sendStatus(200))
