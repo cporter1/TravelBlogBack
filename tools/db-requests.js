@@ -106,10 +106,10 @@ async function createPost(author , blogID , timePosted , title , publish) {
 }
 
 async function deletePost(postID) {
-    let pool = await new Pool(dbConfig)
-    await pool.query('DELETE FROM posts WHERE id = $1' , [postID])
-    pool.end()
-    return;
+  let pool = await new Pool(dbConfig)
+  await pool.query('DELETE FROM posts WHERE id = $1' , [postID])
+  pool.end()
+  return;
 }
 
 async function updatePostArray(bodyArray , postID) {
@@ -150,13 +150,16 @@ async function featureBlog(blogID) {
 }
 
 async function getFeaturedBlogAndPosts() {
-    let pool = await new Pool(dbConfig)
-    const blogData = await pool.query('SELECT * FROM blogs WHERE featured = TRUE LIMIT 1')
-    const bodyData = 
-        await pool.query('SELECT * FROM posts WHERE blog_id = $1 AND published = TRUE ORDER BY time_posted DESC', 
-        [blogData.rows[0].id])
-    pool.end()
-    return [blogData.rows[0] , bodyData.rows]
+  let pool = await new Pool(dbConfig)
+  const blogData = await pool.query('SELECT * FROM blogs WHERE featured = TRUE LIMIT 1')
+  const bodyData = 
+    await pool.query('SELECT * FROM posts WHERE blog_id = $1 AND published = TRUE ORDER BY time_posted DESC', 
+    [blogData.rows[0].id])
+  const comments = 
+    await pool.query('SELECT * FROM comments WHERE blog_parent = $1 ORDER BY post_parent DESC, created_at ASC',
+    [blogData.rows[0].id])
+  pool.end()
+  return [blogData.rows[0] , bodyData.rows, comments.rows]
 }
 
 async function changePublishPostStatus(postID) {
@@ -176,19 +179,33 @@ async function updateBlogLastActivity(blogID , date = Date.now()) {
 
 // COMMENTS //
 
-async function createComment(author , body , timePosted , postID) {
+async function createComment(author , body , timePosted , postID, blogID) {
     let pool = await new Pool(dbConfig)
-    await pool.query( `INSERT INTO comments(author , body , time_posted , post_id)
-        VALUES($1 , $2 , $3 , $4)` , [author , body , timePosted , postID] )
+    await pool.query( `INSERT INTO comments(author , body , created_at , post_parent, blog_parent)
+        VALUES($1 , $2 , $3 , $4, $5)` , [author , body , timePosted , postID, blogID] )
     pool.end()
     return;
 }
 
 async function getCommentsByPostID(ID) {
-    let pool = await new Pool(dbConfig)
-    let data = await pool.query(`SELECT * FROM comments WHERE post_id = $1` , [ID])
-    pool.end()
-    return data.rows;
+  let pool = await new Pool(dbConfig)
+  let data = await pool.query(`SELECT * FROM comments WHERE post_id = $1` , [ID])
+  pool.end()
+  return data.rows;
+}
+
+async function deleteComment(ID) {
+  let pool = await new Pool(dbConfig)
+  await pool.query('DELETE FROM comments WHERE id = $1' , [ID])
+  pool.end()
+  return;
+}
+
+async function updateComment(ID, body) {
+  let pool = await new Pool(dbConfig)
+  await pool.query('UPDATE comments SET body = $2 WHERE id = $1', [ID, body])
+  pool.end()
+  return;
 }
 
 exports.getFeaturedBlogAndPosts = getFeaturedBlogAndPosts;
@@ -215,3 +232,5 @@ exports.getCommentsByPostID = getCommentsByPostID;
 exports.deletePost          = deletePost
 exports.getAllAccounts = getAllAccounts;
 exports.savePostTitle = savePostTitle;
+exports.deleteComment = deleteComment;
+exports.updateComment = updateComment;

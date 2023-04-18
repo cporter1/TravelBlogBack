@@ -53,12 +53,6 @@ router
             .then(async result  => res.send(result))
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
-    .post('/createcomment' , async (req , res) => {
-        DB.createComment(req.body.author , req.body.body , 
-            req.body.timePosted , req.body.postID)
-            .then(res.sendStatus(200))
-            .catch(error => {console.error(error); res.sendStatus(500)})
-    })
     .get('/blogbyblogid' , async (req,res) => {
         DB.getBlogByBlogID(req.query.blogID)
             .then(async result => res.send(result))
@@ -131,7 +125,8 @@ router
     .get('/getfeaturedblog' , async (req,res) => {
         DB.getFeaturedBlogAndPosts()
             .then(async result => {
-                res.send([result[0] , await fetchPostsImages(result[1]) ]) })
+                console.log('result', result[2])
+                res.send([result[0] , await fetchPostsImages(result[1]), result[2] ]) })
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .post('/publishpost' , async (req,res) => {
@@ -140,6 +135,28 @@ router
         .catch(error => {console.error(error); res.sendStatus(500)})
 
     })
+    .post('/createcomment' , async (req,res) => {
+      DB.createComment(req.username, req.body.body, req.body.createdAt, req.body.post_parent,
+        req.body.blog_id)
+        .then(res.sendStatus(200))
+        .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .get('/getpostcomments', async (req,res) => {
+      DB.getCommentsByPostID(req.query.postID)
+        .then(async result => { res.send(result) })
+        .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .post('/deletecomment', async (req,res) => {
+      DB.deleteComment(req.body.ID)
+        .then(res.sendStatus(200))
+        .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .post('/updatecomment', async (req,res) => {
+      DB.updateComment(req.body.ID, req.body.body)
+        .then(res.sendStatus(200))
+        .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+
 
 
 
