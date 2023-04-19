@@ -187,11 +187,13 @@ async function createComment(author , body , timePosted , postID, blogID) {
     return;
 }
 
-async function getCommentsByPostID(ID) {
+async function getCommentsByBlogID(ID) {
   let pool = await new Pool(dbConfig)
-  let data = await pool.query(`SELECT * FROM comments WHERE post_id = $1` , [ID])
+  const comments = 
+    await pool.query('SELECT * FROM comments WHERE blog_parent = $1 ORDER BY post_parent DESC, created_at ASC',
+    [ID])
   pool.end()
-  return data.rows;
+  return comments.rows;
 }
 
 async function deleteComment(ID) {
@@ -228,7 +230,7 @@ exports.getPostByPostID     = getPostByPostID;
 exports.createPost          = createPost;
 exports.updatePostArray     = updatePostArray
 exports.createComment       = createComment;
-exports.getCommentsByPostID = getCommentsByPostID;
+exports.getCommentsByBlogID = getCommentsByBlogID;
 exports.deletePost          = deletePost
 exports.getAllAccounts = getAllAccounts;
 exports.savePostTitle = savePostTitle;

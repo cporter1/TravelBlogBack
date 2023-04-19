@@ -123,11 +123,11 @@ router
             .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .get('/getfeaturedblog' , async (req,res) => {
-        DB.getFeaturedBlogAndPosts()
-            .then(async result => {
-                console.log('result', result[2])
-                res.send([result[0] , await fetchPostsImages(result[1]), result[2] ]) })
-            .catch(error => {console.error(error); res.sendStatus(500)})
+      DB.getFeaturedBlogAndPosts()
+        .then(async result => {
+          console.log('result', result[2])
+          res.send([result[0] , await fetchPostsImages(result[1]), result[2] ]) })
+        .catch(error => {console.error(error); res.sendStatus(500)})
     })
     .post('/publishpost' , async (req,res) => {
         DB.changePublishPostStatus(req.body.postID)
@@ -154,6 +154,11 @@ router
     .post('/updatecomment', async (req,res) => {
       DB.updateComment(req.body.ID, req.body.body)
         .then(res.sendStatus(200))
+        .catch(error => {console.error(error); res.sendStatus(500)})
+    })
+    .get('/getcommentsbyblogid', async (req , res) => {
+      DB.getCommentsByBlogID(req.query.blogID)
+        .then(async result => {console.log(result);res.send(result)})
         .catch(error => {console.error(error); res.sendStatus(500)})
     })
 
